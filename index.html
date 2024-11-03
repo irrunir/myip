@@ -9,6 +9,25 @@
   <title>My IP</title>
   <link rel="stylesheet" href="https://cdn.font.ir/css/Vazir.css">
   <link rel="stylesheet" href="style.css">
+  <style>
+    .centered {
+      text-align: center;
+      font-family: 'Vazir', sans-serif;
+      margin-top: 100px;
+    }
+    .box {
+      display: inline-block;
+      padding: 20px;
+      border: 2px solid #333;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+      font-size: 24px;
+      transition: opacity 0.5s;
+    }
+    .blurred {
+      opacity: 0.3;
+    }
+  </style>
   <script>
     document.onkeydown = function (e) {
       if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || (e.ctrlKey && e.keyCode === 85)) {
@@ -18,47 +37,36 @@
     document.addEventListener('contextmenu', function(e) {
       e.preventDefault();
     });
+
+    function fetchIP() {
+      fetch('https://api.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('ip-address').innerText = data.ip;
+          setTimeout(() => {
+            document.getElementById('ip-address').classList.add('blurred');
+          }, 10000);
+          document.getElementById('ip-address').classList.remove('blurred');
+        });
+      fetch('https://api64.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => {
+          if(data.ip) {
+            document.getElementById('ip-address').innerText = data.ip;
+          }
+        });
+    }
+
+    setInterval(fetchIP, 30000);
+    window.onload = fetchIP;
   </script>
 </head>
 <body>
 
-<div class="centered" ng-app="app" ng-controller="IPController">
+<div class="centered">
   <h1>Your IP address is:</h1>
-  <div class="box blurred">
-    <div ng-if="ipv4" ng-bind="ipv4"></div>
-    <div ng-if="ipv6" ng-bind="ipv6"></div>
-    <button ng-click="revealIP()">Reveal IP</button>
-  </div>
+  <div class="box blurred" id="ip-address"></div>
 </div>
-
-<script src='https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.14/angular.min.js'></script>
-<script>
-  angular.module('app', []).controller('IPController', ['$scope', '$http', function($scope, $http) {
-    const fetchIP = () => {
-      $http.get('https://api.ipify.org?format=json').then(response => {
-        $scope.ipv4 = response.data.ip;
-      }).catch(() => {
-        $scope.ipv4 = null;
-      });
-
-      $http.get('https://api64.ipify.org?format=json').then(response => {
-        $scope.ipv6 = response.data.ip;
-      }).catch(() => {
-        $scope.ipv6 = null;
-      });
-    };
-    
-    fetchIP();
-    setInterval(fetchIP, 30000);
-
-    $scope.revealIP = function() {
-      document.querySelector('.box').classList.remove('blurred');
-      setTimeout(() => {
-        document.querySelector('.box').classList.add('blurred');
-      }, 10000);
-    };
-  }]);
-</script>
 
 </body>
 </html>
