@@ -1,72 +1,102 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa">
 <head>
-  <meta charset="UTF-8">
-  <meta name="description" content="What is my IP?">
-  <meta property="og:type" content="My IP Finder">
-  <meta property="og:title" content="By en.userali.ir">
-  <link rel="icon" href="myip.webp">
-  <title>My IP</title>
-  <link rel="stylesheet" href="https://cdn.font.ir/css/Vazir.css">
-  <link rel="stylesheet" href="style.css">
-  <style>
-    .centered {
-      text-align: center;
-      font-family: 'Vazir', sans-serif;
-      margin-top: 100px;
-    }
-    .box {
-      display: inline-block;
-      padding: 20px;
-      border: 2px solid #333;
-      border-radius: 10px;
-      background-color: #f9f9f9;
-      font-size: 24px;
-      transition: opacity 0.5s;
-    }
-    .blurred {
-      opacity: 0.3;
-    }
-  </style>
-  <script>
-    document.onkeydown = function (e) {
-      if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || (e.ctrlKey && e.keyCode === 85)) {
-        return false;
-      }
-    };
-    document.addEventListener('contextmenu', function(e) {
-      e.preventDefault();
-    });
-
-    function fetchIP() {
-      fetch('https://api.ipify.org?format=json')
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById('ip-address').innerText = data.ip;
-          setTimeout(() => {
-            document.getElementById('ip-address').classList.add('blurred');
-          }, 10000);
-          document.getElementById('ip-address').classList.remove('blurred');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نمایش آدرس IP</title>
+    <link rel="stylesheet" href="https://cdn.fontcdn.ir/Font/Persian/Vazir/Vazir.css">
+    <style>
+        body {
+            font-family: 'Vazir', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        .container {
+            text-align: center;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f4f4f4;
+            display: inline-block;
+        }
+        .blurred {
+            filter: blur(5px);
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        document.onkeydown = function (e) {
+            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) {
+                return false;
+            }
+        };
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
         });
-      fetch('https://api64.ipify.org?format=json')
-        .then(response => response.json())
-        .then(data => {
-          if(data.ip) {
-            document.getElementById('ip-address').innerText = data.ip;
-          }
-        });
-    }
 
-    setInterval(fetchIP, 30000);
-    window.onload = fetchIP;
-  </script>
+        function fetchIP() {
+            const ipContainer = document.getElementById('ipContainer');
+            ipContainer.classList.add('blurred');
+            fetch('https://api64.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    ipContainer.innerText = data.ip;
+                    setTimeout(() => {
+                        ipContainer.classList.add('blurred');
+                    }, 10000);
+                })
+                .catch(() => {
+                    fetch('https://api.ipify.org?format=json')
+                        .then(response => response.json())
+                        .then(data => {
+                            ipContainer.innerText = data.ip;
+                            setTimeout(() => {
+                                ipContainer.classList.add('blurred');
+                            }, 10000);
+                        })
+                        .catch(error => {
+                            ipContainer.innerText = 'خطا در دریافت آدرس IP';
+                            console.error('Error fetching IP:', error);
+                        });
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const ipContainer = document.getElementById('ipContainer');
+            ipContainer.addEventListener('click', () => {
+                ipContainer.classList.remove('blurred');
+                setTimeout(() => {
+                    ipContainer.classList.add('blurred');
+                }, 10000);
+            });
+            fetchIP();
+            setInterval(fetchIP, 30000);
+        });
+    </script>
 </head>
 <body>
-
-<div class="centered">
-  <h1>Your IP address is:</h1>
-  <div class="box blurred" id="ip-address"></div>
-</div>
-
+    <div class="container">
+        <div id="result" class="result">
+            <p>آدرس IP شما: <span id="ipContainer">در حال بارگذاری...</span></p>
+            <p>مرورگر شما: <span id="browserInfo"></span></p>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('browserInfo').innerText = navigator.userAgent;
+        });
+    </script>
 </body>
 </html>
