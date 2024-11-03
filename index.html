@@ -45,6 +45,7 @@
 
         function fetchIP() {
             const ipContainer = document.getElementById('ipContainer');
+            const countryContainer = document.getElementById('countryContainer');
             fetch('https://api64.ipify.org?format=json')
                 .then(response => response.json())
                 .then(data => {
@@ -53,6 +54,11 @@
                     setTimeout(() => {
                         ipContainer.classList.remove('blurred');
                     }, 10000);
+                    fetch(`https://api.ipgeolocation.io/ipgeo?apiKey=f8a469f75c9243a093fa332ffcb0f71b&ip=${data.ip}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            countryContainer.innerText = data.country_name;
+                        });
                 })
                 .catch(() => {
                     fetch('https://api.ipify.org?format=json')
@@ -63,6 +69,11 @@
                             setTimeout(() => {
                                 ipContainer.classList.remove('blurred');
                             }, 10000);
+                            fetch(`https://api.ipgeolocation.io/ipgeo?apiKey=f8a469f75c9243a093fa332ffcb0f71b&ip=${data.ip}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    countryContainer.innerText = data.country_name;
+                                });
                         })
                         .catch(error => {
                             ipContainer.innerText = 'خطا در دریافت آدرس IP';
@@ -71,36 +82,31 @@
                 });
         }
 
-        function getBrowserShortName() {
-            const userAgent = navigator.userAgent;
-            if (userAgent.indexOf("Chrome") > -1) {
-                return "Chrome";
-            } else if (userAgent.indexOf("Safari") > -1) {
-                return "Safari";
-            } else if (userAgent.indexOf("Firefox") > -1) {
-                return "Firefox";
-            } else if (userAgent.indexOf("MSIE") > -1 || !!document.documentMode) {
-                return "IE";
-            } else {
-                return "Unknown";
-            }
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
             const ipContainer = document.getElementById('ipContainer');
-            const browserInfo = document.getElementById('browserInfo');
-
             ipContainer.addEventListener('click', () => {
                 ipContainer.classList.remove('blurred');
                 setTimeout(() => {
                     ipContainer.classList.add('blurred');
                 }, 10000);
             });
-
-            browserInfo.innerText = getBrowserShortName();
-
             fetchIP();
             setInterval(fetchIP, 30000);
+
+            const browserInfo = navigator.userAgent;
+            let browserName;
+            if (browserInfo.indexOf('Chrome') > -1) {
+                browserName = 'Chrome';
+            } else if (browserInfo.indexOf('Firefox') > -1) {
+                browserName = 'Firefox';
+            } else if (browserInfo.indexOf('Safari') > -1) {
+                browserName = 'Safari';
+            } else if (browserInfo.indexOf('Edge') > -1) {
+                browserName = 'Edge';
+            } else {
+                browserName = 'Other';
+            }
+            document.getElementById('browserInfo').innerText = browserName;
         });
     </script>
 </head>
@@ -108,6 +114,7 @@
     <div class="container">
         <div id="ipInfo" class="result">
             <p>آیپی شما > <span id="ipContainer" class="blurred">در حال بارگذاری...</span></p>
+            <p>کشور: <span id="countryContainer">در حال بارگذاری...</span></p>
             <p>مرورگر شما > <span id="browserInfo"></span></p>
         </div>
     </div>
