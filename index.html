@@ -3,32 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نمایش آدرس IP</title>
+    <title>My Ip</title>
     <link rel="stylesheet" href="https://cdn.fontcdn.ir/Font/Persian/Vazir/Vazir.css">
     <style>
         body {
             font-family: 'Vazir', sans-serif;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             background-color: #f4f4f4;
-            text-align: center;
         }
         .container {
             text-align: center;
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         .result {
             margin-top: 20px;
             padding: 10px;
             border-radius: 5px;
-            background-color: #f4f4f4;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
             display: inline-block;
         }
         .blurred {
@@ -48,13 +45,13 @@
 
         function fetchIP() {
             const ipContainer = document.getElementById('ipContainer');
-            ipContainer.classList.add('blurred');
             fetch('https://api64.ipify.org?format=json')
                 .then(response => response.json())
                 .then(data => {
                     ipContainer.innerText = data.ip;
+                    ipContainer.classList.add('blurred');
                     setTimeout(() => {
-                        ipContainer.classList.add('blurred');
+                        ipContainer.classList.remove('blurred');
                     }, 10000);
                 })
                 .catch(() => {
@@ -62,8 +59,9 @@
                         .then(response => response.json())
                         .then(data => {
                             ipContainer.innerText = data.ip;
+                            ipContainer.classList.add('blurred');
                             setTimeout(() => {
-                                ipContainer.classList.add('blurred');
+                                ipContainer.classList.remove('blurred');
                             }, 10000);
                         })
                         .catch(error => {
@@ -73,30 +71,45 @@
                 });
         }
 
+        function getBrowserShortName() {
+            const userAgent = navigator.userAgent;
+            if (userAgent.indexOf("Chrome") > -1) {
+                return "Chrome";
+            } else if (userAgent.indexOf("Safari") > -1) {
+                return "Safari";
+            } else if (userAgent.indexOf("Firefox") > -1) {
+                return "Firefox";
+            } else if (userAgent.indexOf("MSIE") > -1 || !!document.documentMode) {
+                return "IE";
+            } else {
+                return "Unknown";
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const ipContainer = document.getElementById('ipContainer');
+            const browserInfo = document.getElementById('browserInfo');
+
             ipContainer.addEventListener('click', () => {
                 ipContainer.classList.remove('blurred');
                 setTimeout(() => {
                     ipContainer.classList.add('blurred');
                 }, 10000);
             });
+
+            browserInfo.innerText = getBrowserShortName();
+
             fetchIP();
             setInterval(fetchIP, 30000);
         });
     </script>
 </head>
-<body>
+<body ondragstart="return false;" ondrop="return false;">
     <div class="container">
-        <div id="result" class="result">
-            <p>آدرس IP شما: <span id="ipContainer">در حال بارگذاری...</span></p>
+        <div id="ipInfo" class="result">
+            <p>آدرس IP شما: <span id="ipContainer" class="blurred">در حال بارگذاری...</span></p>
             <p>مرورگر شما: <span id="browserInfo"></span></p>
         </div>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('browserInfo').innerText = navigator.userAgent;
-        });
-    </script>
 </body>
-</html>
+</html
