@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="description" content="What is my IP?">
   <meta property="og:type" content="My IP Finder">
-  <meta property="og:title" content="By userali.ir">
+  <meta property="og:title" content="By en.userali.ir">
   <link rel="icon" href="myip.webp">
   <title>My IP</title>
   <link rel="stylesheet" href="https://cdn.font.ir/css/Vazir.css">
@@ -25,7 +25,9 @@
 <div class="centered" ng-app="app" ng-controller="IPController">
   <h1>Your IP address is:</h1>
   <div class="box blurred">
-    <ip-address></ip-address>
+    <div ng-if="ipv4" ng-bind="ipv4"></div>
+    <div ng-if="ipv6" ng-bind="ipv6"></div>
+    <button ng-click="revealIP()">Reveal IP</button>
   </div>
 </div>
 
@@ -33,11 +35,16 @@
 <script>
   angular.module('app', []).controller('IPController', ['$scope', '$http', function($scope, $http) {
     const fetchIP = () => {
-      $http.get('https://api64.ipify.org?format=json').then(response => {
-        $scope.ipv6 = response.data.ip;
-      });
       $http.get('https://api.ipify.org?format=json').then(response => {
         $scope.ipv4 = response.data.ip;
+      }).catch(() => {
+        $scope.ipv4 = null;
+      });
+
+      $http.get('https://api64.ipify.org?format=json').then(response => {
+        $scope.ipv6 = response.data.ip;
+      }).catch(() => {
+        $scope.ipv6 = null;
       });
     };
     
