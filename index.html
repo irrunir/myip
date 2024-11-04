@@ -17,6 +17,7 @@
             align-items: center;
             height: 100vh;
             background-color: #f4f4f4;
+            overflow: hidden; /* جلوگیری از اسکرول */
         }
         .container {
             text-align: center;
@@ -35,16 +36,14 @@
             cursor: pointer;
             transition: filter 0.3s;
         }
-        @media (max-width: 768px) {
-            body {
-                padding: 20px;
-            }
-        }
     </style>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <script>
         // غیرفعال کردن DevTools و کلیک راست
         document.onkeydown = function (e) {
-            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) {
+            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey و (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) {
                 return false;
             }
         };
@@ -52,23 +51,25 @@
             e.preventDefault();
         });
 
-        function fetchIP() {
+        function updateIP() {
             const ipContainer = document.getElementById('ipContainer');
             const countryContainer = document.getElementById('countryContainer');
             fetch('https://api64.ipify.org?format=json')
                 .then(response => response.json())
                 .then(data => {
-                    const ip = data.ip;
-                    ipContainer.innerText = ip;
+                    const newIP = data.ip;
+                    if (ipContainer.innerText !== newIP) {
+                        ipContainer.innerText = newIP;
+                        fetch(`https://api.ipgeolocation.io/ipgeo?apiKey=f8a469f75c9243a093fa332ffcb0f71b&ip=${newIP}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                countryContainer.innerText = data.country_name;
+                            });
+                    }
                     ipContainer.classList.add('blurred');
                     setTimeout(() => {
                         ipContainer.classList.remove('blurred');
-                    }, 10000);
-                    fetch(`https://api.ipgeolocation.io/ipgeo?apiKey=f8a469f75c9243a093fa332ffcb0f71b&ip=${ip}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            countryContainer.innerText = data.country_name;
-                        });
+                    }, 5000);
                 })
                 .catch(error => {
                     ipContainer.innerText = 'خطا در دریافت آدرس IP';
@@ -76,17 +77,7 @@
                 });
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const ipContainer = document.getElementById('ipContainer');
-            ipContainer.addEventListener('click', () => {
-                ipContainer.classList.remove('blurred');
-                setTimeout(() => {
-                    ipContainer.classList.add('blurred');
-                }, 10000);
-            });
-            fetchIP();
-            setInterval(fetchIP, 30000);
-
+        function updateBrowserInfo() {
             const browserInfo = navigator.userAgent;
             let browserName;
             if (browserInfo.indexOf('Chrome') > -1) {
@@ -101,6 +92,20 @@
                 browserName = 'Other';
             }
             document.getElementById('browserInfo').innerText = browserName;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const ipContainer = document.getElementById('ipContainer');
+            ipContainer.addEventListener('click', () => {
+                ipContainer.classList.remove('blurred');
+                setTimeout(() => {
+                    ipContainer.classList.add('blurred');
+                }, 5000);
+            });
+            updateIP();
+            setInterval(updateIP, 10000);
+            updateBrowserInfo();
+            setInterval(updateBrowserInfo, 30000);
         });
     </script>
 </head>
