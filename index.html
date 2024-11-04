@@ -4,7 +4,7 @@
     <link rel="icon" type="image/png" href="./myip.webp" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Ip</title>
+    <title>My IP</title>
     <link rel="stylesheet" href="https://cdn.fontcdn.ir/Font/Persian/Vazir/Vazir.css">
     <style>
         body {
@@ -23,18 +23,26 @@
         }
         .result {
             margin-top: 20px;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 20px;
+            border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             background-color: #ffffff;
             display: inline-block;
+            max-width: 90%;
         }
         .blurred {
             filter: blur(5px);
             cursor: pointer;
+            transition: filter 0.3s;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
         }
     </style>
     <script>
+        // غیرفعال کردن DevTools و کلیک راست
         document.onkeydown = function (e) {
             if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) {
                 return false;
@@ -50,36 +58,21 @@
             fetch('https://api64.ipify.org?format=json')
                 .then(response => response.json())
                 .then(data => {
-                    ipContainer.innerText = data.ip;
+                    const ip = data.ip;
+                    ipContainer.innerText = ip;
                     ipContainer.classList.add('blurred');
                     setTimeout(() => {
                         ipContainer.classList.remove('blurred');
                     }, 10000);
-                    fetch(`https://api.ipgeolocation.io/ipgeo?apiKey=f8a469f75c9243a093fa332ffcb0f71b&ip=${data.ip}`)
+                    fetch(`https://api.ipgeolocation.io/ipgeo?apiKey=f8a469f75c9243a093fa332ffcb0f71b&ip=${ip}`)
                         .then(response => response.json())
                         .then(data => {
                             countryContainer.innerText = data.country_name;
                         });
                 })
-                .catch(() => {
-                    fetch('https://api.ipify.org?format=json')
-                        .then(response => response.json())
-                        .then(data => {
-                            ipContainer.innerText = data.ip;
-                            ipContainer.classList.add('blurred');
-                            setTimeout(() => {
-                                ipContainer.classList.remove('blurred');
-                            }, 10000);
-                            fetch(`https://api.ipgeolocation.io/ipgeo?apiKey=f8a469f75c9243a093fa332ffcb0f71b&ip=${data.ip}`)
-                                .then(response => response.json())
-                                .then(data => {
-                                    countryContainer.innerText = data.country_name;
-                                });
-                        })
-                        .catch(error => {
-                            ipContainer.innerText = 'خطا در دریافت آدرس IP';
-                            console.error('Error fetching IP:', error);
-                        });
+                .catch(error => {
+                    ipContainer.innerText = 'خطا در دریافت آدرس IP';
+                    console.error('Error fetching IP:', error);
                 });
         }
 
@@ -114,10 +107,10 @@
 <body ondragstart="return false;" ondrop="return false;">
     <div class="container">
         <div id="ipInfo" class="result">
-            <p>آیپی شما > <span id="ipContainer" class="blurred">در حال بارگذاری...</span></p>
-            <p>کشور >  <span id="countryContainer">در حال بارگذاری...</span></p>
+            <p>آیپی شما > <span id="ipContainer" class="blurred">♻️</span></p>
+            <p>کشور > <span id="countryContainer">♻️</span></p>
             <p>مرورگر شما > <span id="browserInfo"></span></p>
         </div>
     </div>
 </body>
-</html
+</html>
